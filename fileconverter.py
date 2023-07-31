@@ -1,25 +1,28 @@
 import streamlit as st
 import pandas as pd
+from io import BytesIO
 
 # Function to convert CSV to Excel
-def csv_to_excel(file_path, output_path):
+def csv_to_excel(file_path):
     df = pd.read_csv(file_path)
-    df.to_excel(output_path, index=False)
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+        df.to_excel(writer, index=False)
+    return output.getvalue()
 
 # Function to convert Excel to CSV
-def excel_to_csv(file_path, output_path):
+def excel_to_csv(file_path):
     df = pd.read_excel(file_path)
-    df.to_csv(output_path, index=False)
+    output = BytesIO()
+    df.to_csv(output, index=False)
+    return output.getvalue()
 
 # Function to convert JSON to CSV
-def json_to_csv(file_path, output_path):
+def json_to_csv(file_path):
     df = pd.read_json(file_path)
-    df.to_csv(output_path, index=False)
-
-# Function to convert CSV to JSON
-def csv_to_json(file_path, output_path):
-    df = pd.read_csv(file_path)
-    df.to_json(output_path, orient='records')
+    output = BytesIO()
+    df.to_csv(output, index=False)
+    return output.getvalue()
 
 st.title("File Format Converter")
 
@@ -31,29 +34,29 @@ if file is not None:
     if file_format == "CSV":
         st.write("You can convert your file to:")
         if st.button("Convert to Excel"):
-            csv_to_excel(file, "output.xlsx")
-            st.success("File successfully converted to Excel! You can download it [here](output.xlsx).")
+            converted_file = csv_to_excel(file)
+            st.download_button("Download Converted File", data=converted_file, file_name="output.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
         if st.button("Convert to JSON"):
-            csv_to_json(file, "output.json")
-            st.success("File successfully converted to JSON! You can download it [here](output.json).")
+            converted_file = json_to_csv(file)
+            st.download_button("Download Converted File", data=converted_file, file_name="output.json", mime="application/json")
 
     elif file_format == "Excel":
         st.write("You can convert your file to:")
         if st.button("Convert to CSV"):
-            excel_to_csv(file, "output.csv")
-            st.success("File successfully converted to CSV! You can download it [here](output.csv).")
+            converted_file = excel_to_csv(file)
+            st.download_button("Download Converted File", data=converted_file, file_name="output.csv", mime="text/csv")
 
         if st.button("Convert to JSON"):
-            excel_to_csv(file, "output.json")
-            st.success("File successfully converted to JSON! You can download it [here](output.json).")
+            converted_file = excel_to_csv(file)
+            st.download_button("Download Converted File", data=converted_file, file_name="output.json", mime="application/json")
 
     elif file_format == "JSON":
         st.write("You can convert your file to:")
         if st.button("Convert to CSV"):
-            json_to_csv(file, "output.csv")
-            st.success("File successfully converted to CSV! You can download it [here](output.csv).")
+            converted_file = json_to_csv(file)
+            st.download_button("Download Converted File", data=converted_file, file_name="output.csv", mime="text/csv")
 
         if st.button("Convert to Excel"):
-            json_to_csv(file, "output.xlsx")
-            st.success("File successfully converted to Excel! You can download it [here](output.xlsx).")
+            converted_file = json_to_csv(file)
+            st.download_button("Download Converted File", data=converted_file, file_name="output.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
