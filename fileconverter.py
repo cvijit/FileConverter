@@ -19,7 +19,13 @@ def excel_to_csv(file_path):
 
 # Function to convert JSON to CSV
 def json_to_csv(file_path):
-    df = pd.read_json(file_path)
+    try:
+        df = pd.read_json(file_path)
+    except ValueError:
+        # Handle the ValueError if JSON data is not in the expected format
+        st.error("Error: The provided JSON file is not in the expected format.")
+        return None
+
     output = BytesIO()
     df.to_csv(output, index=False)
     return output.getvalue()
@@ -35,28 +41,34 @@ if file is not None:
         st.write("You can convert your file to:")
         if st.button("Convert to Excel"):
             converted_file = csv_to_excel(file)
-            st.download_button("Download Converted File", data=converted_file, file_name="output.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            if converted_file:
+                st.download_button("Download Converted File", data=converted_file, file_name="output.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
         if st.button("Convert to JSON"):
             converted_file = json_to_csv(file)
-            st.download_button("Download Converted File", data=converted_file, file_name="output.json", mime="application/json")
+            if converted_file:
+                st.download_button("Download Converted File", data=converted_file, file_name="output.json", mime="application/json")
 
     elif file_format == "Excel":
         st.write("You can convert your file to:")
         if st.button("Convert to CSV"):
             converted_file = excel_to_csv(file)
-            st.download_button("Download Converted File", data=converted_file, file_name="output.csv", mime="text/csv")
+            if converted_file:
+                st.download_button("Download Converted File", data=converted_file, file_name="output.csv", mime="text/csv")
 
         if st.button("Convert to JSON"):
-            converted_file = excel_to_csv(file)
-            st.download_button("Download Converted File", data=converted_file, file_name="output.json", mime="application/json")
+            converted_file = json_to_csv(file)
+            if converted_file:
+                st.download_button("Download Converted File", data=converted_file, file_name="output.json", mime="application/json")
 
     elif file_format == "JSON":
         st.write("You can convert your file to:")
         if st.button("Convert to CSV"):
             converted_file = json_to_csv(file)
-            st.download_button("Download Converted File", data=converted_file, file_name="output.csv", mime="text/csv")
+            if converted_file:
+                st.download_button("Download Converted File", data=converted_file, file_name="output.csv", mime="text/csv")
 
         if st.button("Convert to Excel"):
             converted_file = json_to_csv(file)
-            st.download_button("Download Converted File", data=converted_file, file_name="output.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            if converted_file:
+                st.download_button("Download Converted File", data=converted_file, file_name="output.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
